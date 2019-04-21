@@ -9,6 +9,7 @@ import json
 import os
 import random
 import tqdm
+import sys
 
 from speech.utils import data_helpers
 from speech.utils import wave
@@ -30,6 +31,7 @@ def load_phone_map():
 
 def load_transcripts(path):
     pattern = os.path.join(path, "*/*/*.phn")
+    print(pattern)
     m60_48, _ = load_phone_map()
     files = glob.glob(pattern)
     # Standard practic is to remove all "sa" sentences
@@ -43,17 +45,20 @@ def load_transcripts(path):
             phonemes = (l.split()[-1] for l in lines)
             phonemes = [m60_48[p] for p in phonemes if p in m60_48]
             data[f] = phonemes
+    print(sys.getsizeof(data))
     return data
 
 def split_by_speaker(data, dev_speakers=50):
 
     def speaker_id(f):
         return os.path.basename(os.path.dirname(f))
-
     speaker_dict = collections.defaultdict(list)
     for k, v in data.items():
         speaker_dict[speaker_id(k)].append((k, v))
-    speakers = speaker_dict.keys()
+    speakers = list(speaker_dict)
+#    speakers = speaker_dict.keys()
+    print(speakers)
+    print(TEST_SPEAKERS)
     for t in TEST_SPEAKERS:
         speakers.remove(t)
     random.shuffle(speakers)
@@ -94,11 +99,15 @@ if __name__ == "__main__":
     convert_to_wav(path)
 
     print("Preprocessing train")
-    train = load_transcripts(os.path.join(path, "train"))
+    train = load_transcripts(os.path.join(path, "TRAIN"))
+    print(train)
+    print("attempted to print transcripts for train")
     build_json(train, path, "train")
 
     print("Preprocessing dev")
-    transcripts = load_transcripts(os.path.join(path, "test"))
+    transcripts = load_transcripts(os.path.join(path, "TEST"))
+    print(transcripts)
+    print("attempted to print transcripts for dev")
     dev, test = split_by_speaker(transcripts)
     build_json(dev, path, "dev")
 
