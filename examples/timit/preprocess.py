@@ -14,12 +14,18 @@ import sys
 from speech.utils import data_helpers
 from speech.utils import wave
 
-WAV_EXT = "wv" # using wv since NIST took wav
-TEST_SPEAKERS = [ # Core test set from timit/readme.doc
-    'mdab0', 'mwbt0', 'felc0', 'mtas1', 'mwew0', 'fpas0',
-    'mjmp0', 'mlnt0', 'fpkt0', 'mlll0', 'mtls0', 'fjlm0',
-    'mbpm0', 'mklt0', 'fnlp0', 'mcmj0', 'mjdh0', 'fmgd0',
-    'mgrt0', 'mnjm0', 'fdhc0', 'mjln0', 'mpam0', 'fmld0']
+WAV_EXT = "WAV"
+# WAV_EXT = "wv" # using wv since NIST took wav
+#TEST_SPEAKERS = [ # Core test set from timit/readme.doc
+#    'mdab0', 'mwbt0', 'felc0', 'mtas1', 'mwew0', 'fpas0',
+#    'mjmp0', 'mlnt0', 'fpkt0', 'mlll0', 'mtls0', 'fjlm0',
+#    'mbpm0', 'mklt0', 'fnlp0', 'mcmj0', 'mjdh0', 'fmgd0',
+#    'mgrt0', 'mnjm0', 'fdhc0', 'mjln0', 'mpam0', 'fmld0']
+
+TEST_SPEAKERS = ['MDAB0', 'MWBT0', 'FELC0', 'MTAS1', 'MWEW0', \
+    'FPAS0', 'MJMP0', 'MLNT0', 'FPKT0', 'MLLL0', 'MTLS0', 'FJLM0', \
+    'MBPM0', 'MKLT0', 'FNLP0', 'MCMJ0', 'MJDH0', 'FMGD0', 'MGRT0', \
+    'MNJM0', 'FDHC0', 'MJLN0', 'MPAM0', 'FMLD0']
 
 def load_phone_map():
     with open("phones.60-48-39.map", 'r') as fid:
@@ -30,7 +36,7 @@ def load_phone_map():
     return m60_48, m48_39
 
 def load_transcripts(path):
-    pattern = os.path.join(path, "*/*/*.phn")
+    pattern = os.path.join(path, "*/*/*.PHN")
     print(pattern)
     m60_48, _ = load_phone_map()
     files = glob.glob(pattern)
@@ -45,7 +51,7 @@ def load_transcripts(path):
             phonemes = (l.split()[-1] for l in lines)
             phonemes = [m60_48[p] for p in phonemes if p in m60_48]
             data[f] = phonemes
-    print(sys.getsizeof(data))
+    print("size of data: ", sys.getsizeof(data))
     return data
 
 def split_by_speaker(data, dev_speakers=50):
@@ -57,8 +63,7 @@ def split_by_speaker(data, dev_speakers=50):
         speaker_dict[speaker_id(k)].append((k, v))
     speakers = list(speaker_dict)
 #    speakers = speaker_dict.keys()
-    print(speakers)
-    print(TEST_SPEAKERS)
+#    print(speakers)
     for t in TEST_SPEAKERS:
         speakers.remove(t)
     random.shuffle(speakers)
@@ -100,13 +105,14 @@ if __name__ == "__main__":
 
     print("Preprocessing train")
     train = load_transcripts(os.path.join(path, "TRAIN"))
-    print(train)
-    print("attempted to print transcripts for train")
+    print(path)
+    #print(train)
+    #print("attempted to print transcripts for train")
     build_json(train, path, "train")
 
     print("Preprocessing dev")
     transcripts = load_transcripts(os.path.join(path, "TEST"))
-    print(transcripts)
+    # print(transcripts)
     print("attempted to print transcripts for dev")
     dev, test = split_by_speaker(transcripts)
     build_json(dev, path, "dev")
