@@ -12,6 +12,7 @@ import speech.loader as loader
 def eval_loop(model, ldr):
     all_preds = []; all_labels = []
     for batch in tqdm.tqdm(ldr):
+        batch = list(batch)
         preds = model.infer(batch)
         all_preds.extend(preds)
         all_labels.extend(batch[1])
