@@ -1,10 +1,12 @@
 {
     "seed" : 2017,
-    "save_path" : "examples/timit/models/twentyEpochs",
+    "save_path" : "examples/timit/models/newModel",
 
     "data" : {
         "train_set" : "examples/timit/data/train.json",
         "dev_set" : "examples/timit/data/dev.json",
+        "contextTrain" : "/examples/timit/data/contextTrain.json",
+        "contextTest" : "/examples/timit/data/contextTest.json",
         "start_and_end" : false
     },
 

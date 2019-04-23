@@ -100,7 +100,7 @@ if __name__ == "__main__":
         help="Path where the dataset is saved.")
     args = parser.parse_args()
 
-    path = args.output_directory
+    path = os.path.join(args.output_directory, "TIMIT")
 #    path = os.path.join(args.output_directory, "timit")
     path = os.path.abspath(path)
 
