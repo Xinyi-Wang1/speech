@@ -3,8 +3,8 @@
     "save_path" : "examples/timit/models/twentyEpochs",
 
     "data" : {
-        "train_set" : "examples/timit/data/timit/train.json",
-        "dev_set" : "examples/timit/data/timit/dev.json",
+        "train_set" : "examples/timit/data/train.json",
+        "dev_set" : "examples/timit/data/dev.json",
         "start_and_end" : false
     },
 
