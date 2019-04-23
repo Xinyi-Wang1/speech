@@ -28,7 +28,7 @@ TEST_SPEAKERS = ['MDAB0', 'MWBT0', 'FELC0', 'MTAS1', 'MWEW0', \
     'MNJM0', 'FDHC0', 'MJLN0', 'MPAM0', 'FMLD0']
 
 def load_phone_map():
-    with open("phones.60-48-39.map", 'r') as fid:
+    with open("/Users/xinyiwang/Documents/GitHub/speech/examples/timit/phones.60-48-39.map", 'r') as fid:
         lines = (l.strip().split() for l in fid)
         lines = [l for l in lines if len(l) == 3]
     m60_48 = {l[0] : l[1] for l in lines}
