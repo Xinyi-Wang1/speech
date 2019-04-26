@@ -100,8 +100,9 @@ if __name__ == "__main__":
         help="Path where the dataset is saved.")
     args = parser.parse_args()
 
-    path = os.path.join(args.output_directory, "TIMIT")
-#    path = os.path.join(args.output_directory, "timit")
+    path = os.path.join(args.output_directory, "raw")
+#    print("\n")
+#    print(path)
     path = os.path.abspath(path)
 
     print("Converting files from NIST to standard wave format...")
@@ -109,7 +110,7 @@ if __name__ == "__main__":
 
     print("Preprocessing train")
     train, contextTrain = load_transcripts(os.path.join(path, "TRAIN"))
-    print(path)
+#    print(path)
     build_json(train, path, "train")
     build_json(contextTrain, path, "contextTrain")
 
@@ -121,4 +122,4 @@ if __name__ == "__main__":
     print("Preprocessing test")
     build_json(test, path, "test")
 
-    build_json(contextTrain, path, "contextTest")
+    build_json(contextTest, path, "contextTest")

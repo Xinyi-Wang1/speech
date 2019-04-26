@@ -86,11 +86,16 @@ def run(config):
     dev_ldr = loader.make_loader(data_cfg["dev_set"],
                         preproc, batch_size)
 
+    # Want to Make batch size whole？
+    # train_context_ldr = loader.make_loader(data_cfg["contextTrain"],preproc, batch_size)
+    #test_context_ldr = loader.make_loader(data_cfg["contextTest"],preproc, batch_size)
+
     # Model
     model_class = eval("models." + model_cfg["class"])
     model = model_class(preproc.input_dim,
                         preproc.vocab_size,
                         model_cfg)
+    # freq_dim, vocab_size, config
     model.cuda() if use_cuda else model.cpu()
 
     # Optimizer
@@ -146,3 +151,6 @@ if __name__ == "__main__":
     if use_cuda and args.deterministic:
         torch.backends.cudnn.enabled = False
     run(config)
+
+#contextTrain: 4620
+#contextTest: 1680

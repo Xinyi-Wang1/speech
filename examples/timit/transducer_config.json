@@ -5,8 +5,8 @@
     "data" : {
         "train_set" : "examples/timit/data/train.json",
         "dev_set" : "examples/timit/data/dev.json",
-        "contextTrain" : "/examples/timit/data/contextTrain.json",
-        "contextTest" : "/examples/timit/data/contextTest.json",
+        "train_context": "examples/timit/data/contextTrain.json",
+        "test_context": "examples/timit/data/contextTest.json",
         "start_and_end" : false
     },
 
