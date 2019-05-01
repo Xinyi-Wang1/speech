@@ -99,9 +99,12 @@ def run(config):
     model.cuda() if use_cuda else model.cpu()
 
     # Optimizer
-    optimizer = torch.optim.SGD(model.parameters(),
-                    lr=opt_cfg["learning_rate"],
-                    momentum=opt_cfg["momentum"])
+#    optimizer = torch.optim.SGD(model.parameters(),
+#                    lr=opt_cfg["learning_rate"],
+#                    momentum=opt_cfg["momentum"])
+
+    optimizer = torch.optim.Adam(model.parameters(),\
+                                lr=opt_cfg["learning_rate"])
 
     run_state = (0, 0)
     best_so_far = float("inf")

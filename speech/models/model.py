@@ -76,8 +76,6 @@ class Model(nn.Module):
             half = x.size()[-1] // 2
             x = x[:, :, :half] + x[:, :, half:]
 
-        print("x.size() after encoder: ", x.size())
-
         return x
 
     def loss(self, x, y):

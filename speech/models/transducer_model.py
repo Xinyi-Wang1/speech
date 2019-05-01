@@ -27,16 +27,21 @@ class Transducer(model.Model):
                               num_layers=decoder_cfg["layers"],
                               batch_first=True, dropout=config["dropout"])
 
-########load bias data here
         global bias_data
         bias_data, num_bias_input = self.prepBiasData() # need to give z an extra dimension(batch) than x?
-        self.biasEncode = biasEncoder(input_size = num_bias_input, output_size = rnn_dim, embedding_dim = embed_dim)
+        size_bias = bias_data.size()
+        bias_cnn_dim = self.calculate_bias_cnn(size_bias)
+        self.biasEncode = biasEncoder(input_size = num_bias_input, output_size = rnn_dim, embedding_dim = embed_dim, bias_cnn_dim=bias_cnn_dim)
 
-####################
         # include the blank token
         self.blank = vocab_size
         self.fc1 = model.LinearND(rnn_dim, rnn_dim)
         self.fc2 = model.LinearND(rnn_dim, vocab_size + 1)
+
+    def calculate_bias_cnn(self, size_bias, batch_size=8):
+        numElement = np.prod(size_bias)
+        dim = int(numElement / batch_size)
+        return dim
 
     def prepBiasData(self):
         trainfilename = "/Users/xinyiwang/Documents/GitHub/speech/examples/timit/data/contextTrain.json"
@@ -50,13 +55,6 @@ class Transducer(model.Model):
         dim8 = tensor1.view(8, 1, -1)
         return dim8, num_bias_input
 
-        """
-        # fake now
-        data = torch.ones([8, 1, 68076], dtype=torch.float32) # there are 4620 bias; each bias size is 26
-        num_bias = data.shape[0]
-        return data, num_bias
-        """
-
     def forward(self, batch):
         x, y, x_lens, y_lens = self.collate(*batch)
         y_mat = self.label_collate(batch[1])
@@ -66,10 +64,8 @@ class Transducer(model.Model):
         if self.is_cuda:
             x = x.cuda()
             y = y.cuda()
-        #print(x.shape) # torch.Size([8, ?, 161])
         x = self.encode(x)
         shape = x.size()
-        # print("x after self.encode: ",shape) # torch.Size([8, ?, 256])
         z, _ = self.collate_bias(bias_data)
         z = self.biasEncode(z)
         out = self.decode(x, y, z)
@@ -78,7 +74,6 @@ class Transducer(model.Model):
     def loss(self, batch):
         x, y, x_lens, y_lens = self.collate(*batch)
         y_mat = self.label_collate(batch[1])
-        # z, z_lens = self.collate_bias(bias_data)
         out = self.forward_impl(x, y_mat)
         loss_fn = transducer.TransducerLoss()
         loss = loss_fn(out, y, x_lens, y_lens)
@@ -87,7 +82,6 @@ class Transducer(model.Model):
     def decode(self, x, y, z):
         """
         x should be shape (batch, time, hidden dimension)
-        z should be shape (batch, time, hidden dimension)
         y should be shape (batch, label sequence length)
         """
         y = self.embedding(y)
@@ -116,7 +110,6 @@ class Transducer(model.Model):
 
     def collate(self, inputs, labels):
         example = inputs[0]
-        # print(example.shape) # x is an ndarray, (?, 161)
 
         max_t = max(i.shape[0] for i in inputs)
         max_t = self.conv_out_size(max_t, 0)
@@ -192,18 +185,17 @@ class Transducer(model.Model):
 
 class biasEncoder(nn.Module):
 
-    def __init__(self, input_size, output_size, embedding_dim):
+    def __init__(self, input_size, output_size, embedding_dim, bias_cnn_dim):
         super(biasEncoder, self).__init__()
         self.embedding_dim = embedding_dim
         self.embed = nn.Embedding(input_size, embedding_dim)
         self.lstm = nn.LSTM(embedding_dim, 256)
-        self.cnn = torch.nn.Conv1d(in_channels = 68076, out_channels = 1, kernel_size = 2, stride = 1)
+        self.cnn = torch.nn.Conv1d(in_channels = bias_cnn_dim, out_channels = 1, kernel_size = 2, stride = 1)
 
     def forward(self, z):
         z = z.long()
         z = self.embed(z)
         lstm_out, _ = self.lstm(z.view(len(z),-1,self.embedding_dim).contiguous())
-        print(lstm_out.size())
         smaller_out = self.cnn(lstm_out)
         z_mat = torch.zeros([8,1,256])
         z_mat[:,:,:255] = smaller_out
