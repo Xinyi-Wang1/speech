@@ -76,6 +76,8 @@ class Model(nn.Module):
             half = x.size()[-1] // 2
             x = x[:, :, :half] + x[:, :, half:]
 
+        print("x.size() after encoder: ", x.size())
+
         return x
 
     def loss(self, x, y):
@@ -139,4 +141,3 @@ def zero_pad_concat(inputs):
     for e, inp in enumerate(inputs):
         input_mat[e, :inp.shape[0], :] = inp
     return input_mat
-
